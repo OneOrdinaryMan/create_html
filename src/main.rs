@@ -19,7 +19,8 @@ fn main() {
     let html_dir = format!("{}{}", &home_dir, "/Development/HTML");
     let html_path = Path::new(&html_dir);
     if !html_path.try_exists().unwrap() {
-        println!("The path does'nt exists");
+        println!("The path doesnt exists");
         process::exit(1);
     }
+    fs::create_dir(&html_path.join(&args[0])).unwrap();
 }
