@@ -1,16 +1,16 @@
 use std::{
     env, fs,
-    io::{stdin, Write},
+    io::{stdin, Result, Write},
     path::{Path, PathBuf},
     process,
 };
-fn file_contents() -> String {
+fn file_contents() -> Result<String> {
     let mut contents: String = String::new();
     contents.push_str("<!Doctype=HTML>\n<head>\n");
     contents.push_str("<html>\n");
     let mut title = String::new();
     println!("Input the title here!");
-    stdin().read_line(&mut title).unwrap();
+    stdin().read_line(&mut title)?;
     title.insert_str(0, "<title> ");
     title = String::from(title.trim_end());
     title.push_str(" </title>");
@@ -18,7 +18,7 @@ fn file_contents() -> String {
     contents.push_str("\n</head>\n");
     contents.push_str("<body>\nHello\n</body>\n");
     contents.push_str("</html>");
-    contents
+    Ok(contents)
 }
 
 fn check_args() -> String {
@@ -45,30 +45,44 @@ fn check_env() -> String {
     home_dir
 }
 
-fn html_dir_path(home_str: String) -> PathBuf {
+fn html_dir_path(home_str: String) -> Result<PathBuf> {
     let html_dir = format!("{}{}", &home_str, "/Development/HTML");
     let html_path = Path::new(&html_dir);
 
-    if !html_path.try_exists().unwrap() {
+    if !html_path.try_exists()? {
         println!("The path doesnt exists");
         process::exit(1);
     }
-    html_path.to_path_buf()
+    Ok(html_path.to_path_buf())
 }
 
-fn create_files(html_path: PathBuf, args: String, write_string: String) {
-    fs::create_dir(&html_path.join(&args)).unwrap();
+fn create_files(html_path: PathBuf, args: String, write_string: String) -> Result<()> {
+    fs::create_dir(&html_path.join(&args))?;
     let mut file = fs::OpenOptions::new()
         .create_new(true)
         .write(true)
-        .open(&html_path.join(args.to_owned() + "/index.html"))
-        .unwrap();
-    file.write_all(write_string.as_bytes()).unwrap();
+        .open(&html_path.join(args.to_owned() + "/index.html"))?;
+    file.write_all(write_string.as_bytes())?;
+    Ok(())
 }
 fn main() {
     let args = check_args();
-    let write_string = file_contents();
+    let write_string = match file_contents() {
+        Ok(value) => value,
+        Err(e) => {
+            println!("Error found here: {}", e);
+            String::new()
+        }
+    };
     let home_dir = check_env();
-    let html_path = html_dir_path(home_dir);
-    create_files(html_path, args, write_string);
+    match html_dir_path(home_dir) {
+        Ok(html_path) => match create_files(html_path, args, write_string) {
+            Ok(()) => println!("Success! file created"),
+            Err(e) => println!("Failed due to an error {}", e),
+        },
+        Err(e) => {
+            println!("Error: {}", e);
+            process::exit(1);
+        }
+    }
 }
