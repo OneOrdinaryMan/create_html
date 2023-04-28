@@ -56,11 +56,7 @@ fn html_dir_path(home_str: String) -> PathBuf {
     html_path.to_path_buf()
 }
 
-fn main() {
-    let args = check_args();
-    let write_string = file_contents();
-    let home_dir = check_env();
-    let html_path = html_dir_path(home_dir);
+fn create_files(html_path: PathBuf, args: String, write_string: String) {
     fs::create_dir(&html_path.join(&args)).unwrap();
     let mut file = fs::OpenOptions::new()
         .create_new(true)
@@ -68,4 +64,11 @@ fn main() {
         .open(&html_path.join(args.to_owned() + "/index.html"))
         .unwrap();
     file.write_all(write_string.as_bytes()).unwrap();
+}
+fn main() {
+    let args = check_args();
+    let write_string = file_contents();
+    let home_dir = check_env();
+    let html_path = html_dir_path(home_dir);
+    create_files(html_path, args, write_string);
 }
