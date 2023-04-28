@@ -1,7 +1,7 @@
 use std::{
     env, fs,
     io::{stdin, Write},
-    path::Path,
+    path::{Path, PathBuf},
     process,
 };
 fn file_contents() -> String {
@@ -33,9 +33,7 @@ fn check_args() -> String {
     args[0].to_string()
 }
 
-fn main() {
-    let args = check_args();
-    let write_string = file_contents();
+fn check_env() -> String {
     let home_dir = match option_env!("HOME") {
         Some(value) => String::from(value),
         None => String::new(),
@@ -44,12 +42,25 @@ fn main() {
         println!("The env is not set");
         process::exit(1);
     }
-    let html_dir = format!("{}{}", &home_dir, "/Development/HTML");
+    home_dir
+}
+
+fn html_dir_path(home_str: String) -> PathBuf {
+    let html_dir = format!("{}{}", &home_str, "/Development/HTML");
     let html_path = Path::new(&html_dir);
+
     if !html_path.try_exists().unwrap() {
         println!("The path doesnt exists");
         process::exit(1);
     }
+    html_path.to_path_buf()
+}
+
+fn main() {
+    let args = check_args();
+    let write_string = file_contents();
+    let home_dir = check_env();
+    let html_path = html_dir_path(home_dir);
     fs::create_dir(&html_path.join(&args)).unwrap();
     let mut file = fs::OpenOptions::new()
         .create_new(true)
