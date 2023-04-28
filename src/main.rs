@@ -20,7 +20,8 @@ fn file_contents() -> String {
     contents.push_str("</html>");
     contents
 }
-fn main() {
+
+fn check_args() -> String {
     let args: Vec<String> = env::args().skip(1).collect();
     if args.is_empty() {
         println!("There are no arguments!");
@@ -29,9 +30,13 @@ fn main() {
         println!("There are more than one arguments");
         process::exit(1);
     }
+    args[0].to_string()
+}
+
+fn main() {
+    let args = check_args();
     let write_string = file_contents();
-    let home_env = option_env!("HOME");
-    let home_dir = match home_env {
+    let home_dir = match option_env!("HOME") {
         Some(value) => String::from(value),
         None => String::new(),
     };
@@ -45,11 +50,11 @@ fn main() {
         println!("The path doesnt exists");
         process::exit(1);
     }
-    fs::create_dir(&html_path.join(&args[0])).unwrap();
+    fs::create_dir(&html_path.join(&args)).unwrap();
     let mut file = fs::OpenOptions::new()
         .create_new(true)
         .write(true)
-        .open(&html_path.join(args[0].to_owned() + "/index.html"))
+        .open(&html_path.join(args.to_owned() + "/index.html"))
         .unwrap();
     file.write_all(write_string.as_bytes()).unwrap();
 }
