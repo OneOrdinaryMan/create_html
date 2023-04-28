@@ -1,4 +1,25 @@
-use std::{env, fs, io::Write, path::Path, process};
+use std::{
+    env, fs,
+    io::{stdin, Write},
+    path::Path,
+    process,
+};
+fn file_contents() -> String {
+    let mut contents: String = String::new();
+    contents.push_str("<!Doctype=HTML>\n<head>\n");
+    contents.push_str("<html>\n");
+    let mut title = String::new();
+    println!("Input the title here!");
+    stdin().read_line(&mut title).unwrap();
+    title.insert_str(0, "<title> ");
+    title = String::from(title.trim_end());
+    title.push_str(" </title>");
+    contents.push_str(&title);
+    contents.push_str("\n</head>\n");
+    contents.push_str("<body>\nHello\n</body>\n");
+    contents.push_str("</html>");
+    contents
+}
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
     if args.is_empty() {
@@ -8,7 +29,7 @@ fn main() {
         println!("There are more than one arguments");
         process::exit(1);
     }
-    let write_string = String::from("<!Doctype=html>\n<html>\n<head><title>Hello World</title>\n</head>\n<body>Hello World\n</body></html>");
+    let write_string = file_contents();
     let home_env = option_env!("HOME");
     let home_dir = match home_env {
         Some(value) => String::from(value),
