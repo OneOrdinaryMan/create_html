@@ -6,8 +6,8 @@ use std::{
 };
 fn file_contents() -> Result<String> {
     let mut contents: String = String::new();
-    contents.push_str("<!Doctype=HTML>\n<head>\n");
-    contents.push_str("<html>\n");
+    contents.push_str("<!Doctype=HTML>\n<html>\n");
+    contents.push_str("<head>\n");
     let mut title = String::new();
     println!("Input the title here!");
     stdin().read_line(&mut title)?;
