@@ -1,6 +1,6 @@
 [package]
 name = "create_html"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["One_Ordinary_Man"]
 description = "Creates index.html with all the boilerplate inside designated folder"
